@@ -1,7 +1,9 @@
 import os
+import io
 import shutil
 from PIL import Image
 from natsort import natsorted
+import yaml
 
 import prepr_linemode_util as util
 
@@ -17,8 +19,12 @@ depth_folder = 'depth'
 mask_folder = 'mask'
 rgb_folder = 'rgb'
 
+# yaml files path
+ground_truth_path = main_data_path+'/gt.yml'
+camera_info_path = main_data_path+'/info.yml'
+
 #what kind of files want to get extraceted
-depth_ending = '.depth.cm.16.png'
+depth_ending = '.depth.mm.16.png'
 mask_ending = '.cs.png'
 rgb_ending = '.png'
 all_endings = ['.cs.png','.16.png','.8.png','.micon.png','.depth.png','.is.png']
@@ -57,3 +63,32 @@ for picture_name in sorted_list_of_files:
         util.copy_and_rename(raw_data_directory, picture_name, rgb_index, rgb_path)
         rgb_index += 1
         print(picture_name)
+
+# writing the yaml filses:
+
+max_number_of_pics = rgb_index
+
+
+cam_K = [572.4114, 0.0, 325.2611, 0.0, 573.57043, 242.04899, 0.0, 0.0, 1.0]
+depth_scale = 1.0
+
+i = 0
+try:
+    os.remove(camera_info_path)
+except FileNotFoundError:
+    print(camera_info_path + ' doesnt exist')
+for i in range(max_number_of_pics):
+    util.parse_camera_intrinsic_yml(camera_info_path, i,cam_K,depth_scale)
+
+cam_R_m2c_array = [0.09630630, 0.99404401, 0.05100790, 0.57332098, -0.01350810, -0.81922001, -0.81365103, 0.10814000, -0.57120699]
+cam_t_m2c_array = [-105.35775150, -117.52119142, 1014.87701320]
+obj_bb = [245,50,23,23]
+obj_id = 1
+
+j=0
+try:
+    os.remove(ground_truth_path)
+except FileNotFoundError:
+    print(ground_truth_path + ' doesnt exist')
+for j in range(max_number_of_pics):
+    util.parse_groundtruth_yml(ground_truth_path,j,cam_R_m2c_array,cam_t_m2c_array,obj_bb,16)

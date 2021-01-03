@@ -9,20 +9,17 @@ import matplotlib.pyplot as plt
 
 import seaborn as sns
 
-
-depth_folder = 'different_depths/raw_images'
-csv_folder = 'different_depths/csv'
+depth_folder = 'diff_depths_with_cube/raw_images'
+csv_folder = 'diff_depths_with_cube/csv'
 
 #save_ad = csv_folder+'/'+images+'.csv', im, delimiter=","
-
-eff_example_folder = 'efficientpose_example/raw_images'
 
 def heatmap2d(arr: np.ndarray,titel):
     plt.imshow(arr, cmap='viridis')
     plt.title(titel)
     plt.colorbar()
     #plt.show()
-    plt.savefig('different_depths/{}.png'.format(titel))
+    plt.savefig('diff_depths_with_cube/{}.png'.format(titel))
     plt.close()
 
 for images in os.listdir(depth_folder):

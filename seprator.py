@@ -18,7 +18,7 @@ jpeg_rgb_folder = 'JPEGImages'
 png_rgb_folder = 'PNGImages'
 
 #what kind of files want to get extraceted
-depth_ending = '.depth.cm.16.png'
+depth_ending = 'depth.mm.16.png'
 mask_ending = '.cs.png'
 rgb_ending = '.png'
 all_endings = ['.cs.png','.16.png','.8.png','.micon.png','.depth.png','.is.png']
