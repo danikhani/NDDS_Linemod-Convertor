@@ -4,12 +4,19 @@ import shutil
 from PIL import Image
 from natsort import natsorted
 import yaml
+import json
+import numpy as np
 
 import prepr_linemode_util as util
 
 raw_data_directory = 'controllercapture_try1'
 corrected_ending = '.png'
 
+object_id = 16
+# default settings:
+cam_K = [572.4114, 0.0, 325.2611, 0.0, 573.57043, 242.04899, 0.0, 0.0, 1.0]
+depth_scale = 1.0
+image_size = [640, 480]
 
 #structure of data:
 main_data_path = 'generated_linemode/data/16'
@@ -47,48 +54,56 @@ mask_index = 0
 depth_index = 0
 rgb_index = 0
 sorted_list_of_files = natsorted(os.listdir(raw_data_directory))
-for picture_name in sorted_list_of_files:
+for data_name in sorted_list_of_files:
     # find mask data
-    if picture_name.endswith(mask_ending):
-        util.copy_and_rename(raw_data_directory, picture_name, mask_index, mask_path)
+    if data_name.endswith(mask_ending):
+        util.copy_and_rename(raw_data_directory, data_name, mask_index, mask_path)
         mask_index += 1
-        print(picture_name)
     # find depth data
-    if picture_name.endswith(depth_ending):
-        util.copy_and_rename(raw_data_directory,picture_name,depth_index,depth_path)
+    if data_name.endswith(depth_ending):
+        util.copy_and_rename(raw_data_directory, data_name, depth_index, depth_path)
         depth_index += 1
-        print(picture_name)
-    # find depth data
-    if picture_name.endswith(rgb_ending) and not any(picture_name.endswith(x) for x in all_endings):
-        util.copy_and_rename(raw_data_directory, picture_name, rgb_index, rgb_path)
+    # find rgb data
+    if data_name.endswith(rgb_ending) and not any(data_name.endswith(x) for x in all_endings):
+        util.copy_and_rename(raw_data_directory, data_name, rgb_index, rgb_path)
         rgb_index += 1
-        print(picture_name)
+    if data_name.endswith('camera_settings.json'):
+        cam_K, depth_scale, image_size = util.get_camera_intrinsic(raw_data_directory,data_name)
+        print('camera.settings.json found and instritics updated:')
+        print(cam_K)
+        print(depth_scale)
+        print(image_size)
 
-# writing the yaml filses:
 
-max_number_of_pics = rgb_index
-
-
-cam_K = [572.4114, 0.0, 325.2611, 0.0, 573.57043, 242.04899, 0.0, 0.0, 1.0]
-depth_scale = 1.0
-
-i = 0
-try:
-    os.remove(camera_info_path)
-except FileNotFoundError:
-    print(camera_info_path + ' doesnt exist')
-for i in range(max_number_of_pics):
-    util.parse_camera_intrinsic_yml(camera_info_path, i,cam_K,depth_scale)
-
-cam_R_m2c_array = [0.09630630, 0.99404401, 0.05100790, 0.57332098, -0.01350810, -0.81922001, -0.81365103, 0.10814000, -0.57120699]
-cam_t_m2c_array = [-105.35775150, -117.52119142, 1014.87701320]
-obj_bb = [245,50,23,23]
-obj_id = 1
-
-j=0
+#removing and recreating the yml files:
 try:
     os.remove(ground_truth_path)
 except FileNotFoundError:
     print(ground_truth_path + ' doesnt exist')
-for j in range(max_number_of_pics):
-    util.parse_groundtruth_yml(ground_truth_path,j,cam_R_m2c_array,cam_t_m2c_array,obj_bb,16)
+
+try:
+    os.remove(camera_info_path)
+except FileNotFoundError:
+    print(camera_info_path + ' doesnt exist')
+
+# writing the yaml filses:
+yml_index = 0
+for data_name in sorted_list_of_files:
+    # writing gt.yml
+    if data_name.endswith('.json') and not data_name.endswith('settings.json'):
+        #get the arrays from the json files.
+        cam_R_m2c_array, cam_t_m2c_array, obj_bb = util.get_groundtruth_data(raw_data_directory, data_name)
+        #save arrays in gt.yml
+        util.parse_groundtruth_yml(ground_truth_path, yml_index, cam_R_m2c_array, cam_t_m2c_array, obj_bb, object_id)
+        # save info.yml
+        util.parse_camera_intrinsic_yml(camera_info_path, yml_index, cam_K, depth_scale)
+        yml_index +=1
+
+print('data generated!')
+print('yml_index,mask_index,depth_index,rgb_index are:')
+print(yml_index,mask_index,depth_index,rgb_index)
+
+
+
+
+
