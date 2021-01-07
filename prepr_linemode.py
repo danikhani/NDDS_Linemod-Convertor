@@ -24,7 +24,7 @@ def make_linemode_dataset(raw_NDDS_directory,saving_path,object_id):
     camera_info_path = main_data_path+'/info.yml'
 
     #what kind of files want to get extraceted
-    depth_ending = '.depth.mm.16.png'
+    depth_ending = '.depth.cm.16.png'
     mask_ending = '.cs.png'
     rgb_ending = '.png'
     all_endings = ['.cs.png','.16.png','.8.png','.micon.png','.depth.png','.is.png']

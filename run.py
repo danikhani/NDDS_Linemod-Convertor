@@ -10,5 +10,5 @@ def parse_input():
 
 if __name__ == "__main__":
     args = parse_input()
-    make_linemode_dataset('controllercapture_try1', 'generated_linemode2', 16)
+    make_linemode_dataset('datasets/try1', 'datasets/try1_linemode', 16)
 
