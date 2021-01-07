@@ -120,14 +120,14 @@ def get_groundtruth_data(raw_data_directory,json_file):
 
     # get bounding box:
     bounding_box = object_from_annotation[0]['bounding_box']
-    bb_top_left = np.array(bounding_box['top_left'])
-    bottom_right = np.array(bounding_box['bottom_right'])
-    width_height = bottom_right - bb_top_left
-    # round to int since they are pixel coord. Also make a list out of them for yaml export
-    x_y = list(np.rint(bb_top_left))
-    dx_dy = list(np.rint(width_height))
+    xmin,ymin = np.array(bounding_box['top_left'])
+    xmax,ymax = np.array(bounding_box['bottom_right'])
+    # round the pixels
+    xmin, ymin, xmax, ymax = int(xmin), int(ymin), int(xmax), int(ymax)
+    deltax= xmax-xmin
+    deltay = ymax - ymin
+    obj_bb =[ymin, xmin,deltay,deltax]
 
-    obj_bb = list(map(int, x_y)) + list(map(int, dx_dy))
 
     # yaml.dump doenst support numpy arrays. Here they are converted to python array
     cam_R_m2c_array =[]

@@ -6,6 +6,7 @@ import random
 import copy
 from plyfile import PlyData
 from PIL import Image
+import matplotlib.pyplot as plt
 
 
 import test_lib as tlib
@@ -60,3 +61,8 @@ def vis_bb(rgb_image_path,models_info_yml_path,gt_yml_path,info_yml_path,img_exp
                                append_centerpoint=False)
     tlib.draw_bbox_8_2D(rgb_3d_bbox, projected_points)
     cv2.imwrite(img_path_3d, rgb_3d_bbox)
+
+    img = cv2.imread(img_path_2d, 0)
+
+    plt.imshow(img)
+    plt.show()
