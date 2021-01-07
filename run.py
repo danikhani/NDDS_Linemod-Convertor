@@ -23,5 +23,14 @@ if __name__ == "__main__":
     info_yml_path = dataset_main_path + 'data/01/info.yml'
     img_export_folder = 'datasets/testfolder'
 
-    #vis_bb(rgb_image_path, models_info_yml_path, gt_yml_path, info_yml_path, img_export_folder, frame_number,model_number)
+    model_number = 16
+    frame_number = 4
+    dataset_main_path = 'datasets/try1_linemode/generated_dataset/'
+    rgb_image_path = dataset_main_path + 'data/16/rgb/4.png'
+    models_info_yml_path = 'datasets/try1_linemode/models_info.yml'
+    gt_yml_path = dataset_main_path + 'data/16/gt.yml'
+    info_yml_path = dataset_main_path + 'data/16/info.yml'
+    img_export_folder = 'datasets/testfolder/owndata'
 
+    #vis_bb(rgb_image_path, models_info_yml_path, gt_yml_path, info_yml_path, img_export_folder, frame_number,model_number)
+    vis_bb(rgb_image_path, models_info_yml_path, gt_yml_path, info_yml_path, img_export_folder, frame_number,model_number)

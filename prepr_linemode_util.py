@@ -5,7 +5,8 @@ import yaml
 import io
 import json
 import numpy as np
-
+from scipy.spatial.transform import Rotation as R
+import cv2
 
 # makes the folder structure
 def make_empty_folder(main_path,folder):
@@ -91,20 +92,31 @@ def get_groundtruth_data(raw_data_directory,json_file):
     with open(source_file, 'r') as file:
         annotation = json.loads(file.read())
 
+
+    '''this is where magic heppens'''
     object_from_annotation = annotation['objects']
     # object_class = object_from_annotation[0]["class"]
 
     # translation
-    translation = np.array(object_from_annotation[0]['location']) * 10
-    translation = np.round(translation, 8)
+    #translation = np.array(object_from_annotation[0]['location']) * 10
+    #translation = np.round(translation, 8)
 
     # rotation
-    rotation = np.asarray(object_from_annotation[0]['pose_transform'])[0:3, 0:3]
-    rotation = np.dot(rotation, np.array([[-1, 0, 0], [0, -1, 0], [0, 0, -1]]))
-    rotation = np.dot(rotation.T, np.array([[1, 0, 0], [0, 1, 0], [0, 0, -1]]))
+    #rotation = np.asarray(object_from_annotation[0]['pose_transform'])[0:3, 0:3]
+    #rotation = np.dot(rotation, np.array([[-1, 0, 0], [0, -1, 0], [0, 0, -1]]))
+    #rotation = np.dot(rotation.T, np.array([[1, 0, 0], [0, 1, 0], [0, 0, -1]]))
+
+    translation = np.array(annotation['objects'][0]['location']) * 10  # NDDS gives units in centimeters
+
+    quaternion_obj2cam = R.from_quat(np.array(annotation['objects'][0]['quaternion_xyzw']))
+    quaternion_cam2world = R.from_quat(np.array(annotation['camera_data']['quaternion_xyzw_worldframe']))
+    quaternion_obj2world = quaternion_obj2cam * quaternion_cam2world
+
+    mirrored_y_axis = np.dot(quaternion_obj2world.as_dcm(), np.array([[-1, 0, 0], [0, -1, 0], [0, 0, 1]]))
+    rotation_list = list(mirrored_y_axis[0, :]) + list(mirrored_y_axis[1, :]) + list(mirrored_y_axis[2, :])
     # make list from rows and add them to a single array
-    rotation = np.round(rotation, 8)
-    rotation_list = list(rotation[0, :]) + list(rotation[1, :]) + list(rotation[2, :])
+    #rotation = np.round(rotation, 8)
+    #rotation_list = list(rotation[0, :]) + list(rotation[1, :]) + list(rotation[2, :])
 
     # get bounding box:
     bounding_box = object_from_annotation[0]['bounding_box']
