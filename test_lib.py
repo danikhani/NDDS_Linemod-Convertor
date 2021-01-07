@@ -62,6 +62,40 @@ def load_model_ply(path_to_ply_file):
         return points_3d
 
 
+
+def get_bbox_3d(model_dict):
+    """
+    Converts the 3D model cuboid from the Linemod format (min_x, min_y, min_z, size_x, size_y, size_z) to the (num_corners = 8, num_coordinates = 3) format
+    Args:
+        model_dict: Dictionary containing the cuboid information of a single Linemod 3D model in the Linemod format
+    Returns:
+        bbox: numpy (8, 3) array containing the 3D model's cuboid, where the first dimension represents the corner points and the second dimension contains the x-, y- and z-coordinates.
+
+    """
+    # get infos from model dict
+    min_point_x = model_dict["min_x"]
+    min_point_y = model_dict["min_y"]
+    min_point_z = model_dict["min_z"]
+
+    size_x = model_dict["size_x"]
+    size_y = model_dict["size_y"]
+    size_z = model_dict["size_z"]
+
+    bbox = np.zeros(shape=(8, 3))
+    # untere ebende
+    bbox[0, :] = np.array([min_point_x, min_point_y, min_point_z])
+    bbox[1, :] = np.array([min_point_x + size_x, min_point_y, min_point_z])
+    bbox[2, :] = np.array([min_point_x + size_x, min_point_y + size_y, min_point_z])
+    bbox[3, :] = np.array([min_point_x, min_point_y + size_y, min_point_z])
+    # obere ebene
+    bbox[4, :] = np.array([min_point_x, min_point_y, min_point_z + size_z])
+    bbox[5, :] = np.array([min_point_x + size_x, min_point_y, min_point_z + size_z])
+    bbox[6, :] = np.array([min_point_x + size_x, min_point_y + size_y, min_point_z + size_z])
+    bbox[7, :] = np.array([min_point_x, min_point_y + size_y, min_point_z + size_z])
+
+    return bbox
+
+
 def project_bbox_3D_to_2D(points_bbox_3D, rotation_vector, translation_vector, camera_matrix, append_centerpoint=True):
     """ Projects the 3D model's cuboid onto a 2D image plane with the given rotation, translation and camera matrix.
 

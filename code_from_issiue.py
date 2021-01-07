@@ -81,3 +81,4 @@ def vis_bb(image_name,name,savefolder):
 
 
 vis_bb('000012.png','000012.json','datasets/testfolder')
+
