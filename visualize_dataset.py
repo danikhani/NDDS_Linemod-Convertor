@@ -10,14 +10,7 @@ from PIL import Image
 
 import test_lib as tlib
 
-model_number = 4
-frame_number = 24
-dataset_main_path = 'datasets/Linemod_preprocessed/'
-rgb_image_path =dataset_main_path + 'data/04/rgb/0024.png'
-models_info_yml_path =dataset_main_path + 'models/models_info.yml'
-gt_yml_path = dataset_main_path + 'data/04/gt.yml'
-info_yml_path = dataset_main_path + 'data/04/info.yml'
-img_export_folder = 'datasets/testfolder'
+
 
 def load_linemod_data(models_info_yml_path,gt_yml_path,info_yml_path,frame_number,model_number):
     # load points from model_info.yml
@@ -67,6 +60,3 @@ def vis_bb(rgb_image_path,models_info_yml_path,gt_yml_path,info_yml_path,img_exp
                                append_centerpoint=False)
     tlib.draw_bbox_8_2D(rgb_3d_bbox, projected_points)
     cv2.imwrite(img_path_3d, rgb_3d_bbox)
-
-
-vis_bb(rgb_image_path,models_info_yml_path,gt_yml_path,info_yml_path,img_export_folder,frame_number,model_number)
