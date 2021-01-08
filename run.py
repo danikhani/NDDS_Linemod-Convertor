@@ -18,4 +18,5 @@ if __name__ == "__main__":
     model_number = 17
     frame_number = 0
     dataset_main_path = 'datasets/test_dataset/generated_dataset/'
-    vis_bb(dataset_main_path, frame_number,model_number,'datasets/test_dataset')
+    export_path = 'datasets/test_dataset'
+    vis_bb(dataset_main_path, frame_number,model_number,export_path)
