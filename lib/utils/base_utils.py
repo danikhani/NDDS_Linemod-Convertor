@@ -86,7 +86,7 @@ def get_groundtruth_data(raw_data_directory,json_file):
     object_from_annotation = annotation['objects']
     # object_class = object_from_annotation[0]["class"]
 
-    translation = np.array(annotation['objects'][0]['location'])  # NDDS gives units in centimeters
+    translation = np.array(annotation['objects'][0]['location']) # NDDS gives units in centimeters
 
     quaternion_obj2cam = rotate.from_quat(np.array(annotation['objects'][0]['quaternion_xyzw']))
     quaternion_cam2world = rotate.from_quat(np.array(annotation['camera_data']['quaternion_xyzw_worldframe']))
