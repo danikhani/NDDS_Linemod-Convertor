@@ -5,8 +5,37 @@ import yaml
 import io
 import json
 import numpy as np
-from scipy.spatial.transform import Rotation as R
+from scipy.spatial.transform import Rotation as rotate
 import cv2
+import sys
+import os
+import time
+import math
+
+import numpy as np
+from PIL import Image, ImageDraw, ImageFont
+import cv2
+
+
+import struct
+import imghdr
+
+#https://github.com/Microsoft/singleshotpose/blob/master/utils.py#L39:L44
+def pnp(points_3D, points_2D, cameraMatrix):
+    try:
+        distCoeffs = pnp.distCoeffs
+    except:
+        distCoeffs = np.zeros((8, 1), dtype='float32')
+
+    assert points_2D.shape[0] == points_2D.shape[0], 'points 3D and points 2D must have same number of vertices'
+
+    _, R_exp, t = cv2.solvePnP(points_3D,
+                              np.ascontiguousarray(points_2D[:,:2]).reshape((-1,1,2)),
+                              cameraMatrix,
+                              distCoeffs)
+
+    R, _ = cv2.Rodrigues(R_exp)
+    return R, t
 
 # makes the folder structure
 def make_empty_folder(main_path,folder):
@@ -97,26 +126,35 @@ def get_groundtruth_data(raw_data_directory,json_file):
     object_from_annotation = annotation['objects']
     # object_class = object_from_annotation[0]["class"]
 
-    # translation
-    #translation = np.array(object_from_annotation[0]['location']) * 10
-    #translation = np.round(translation, 8)
+
+    '''# translation
+    translation = np.array(object_from_annotation[0]['location']) * 10
+    translation = np.round(translation, 8)
 
     # rotation
-    #rotation = np.asarray(object_from_annotation[0]['pose_transform'])[0:3, 0:3]
-    #rotation = np.dot(rotation, np.array([[-1, 0, 0], [0, -1, 0], [0, 0, -1]]))
-    #rotation = np.dot(rotation.T, np.array([[1, 0, 0], [0, 1, 0], [0, 0, -1]]))
+    rotation = np.asarray(object_from_annotation[0]['pose_transform'])[0:3, 0:3]
+    rotation = np.dot(rotation, np.array([[-1, 0, 0], [0, -1, 0], [0, 0, -1]]))
+    rotation = np.dot(rotation.T, np.array([[1, 0, 0], [0, 1, 0], [0, 0, -1]]))
+    # make list from rows and add them to a single array
+    rotation = np.round(rotation, 8)
+    rotation_list = list(rotation[0, :]) + list(rotation[1, :]) + list(rotation[2, :])'''
 
-    translation = np.array(annotation['objects'][0]['location']) * 10  # NDDS gives units in centimeters
 
-    quaternion_obj2cam = R.from_quat(np.array(annotation['objects'][0]['quaternion_xyzw']))
-    quaternion_cam2world = R.from_quat(np.array(annotation['camera_data']['quaternion_xyzw_worldframe']))
+    translation = np.array(annotation['objects'][0]['location']) *10  # NDDS gives units in centimeters
+
+    quaternion_obj2cam = rotate.from_quat(np.array(annotation['objects'][0]['quaternion_xyzw']))
+    quaternion_cam2world = rotate.from_quat(np.array(annotation['camera_data']['quaternion_xyzw_worldframe']))
     quaternion_obj2world = quaternion_obj2cam * quaternion_cam2world
 
     mirrored_y_axis = np.dot(quaternion_obj2world.as_dcm(), np.array([[-1, 0, 0], [0, -1, 0], [0, 0, 1]]))
     rotation_list = list(mirrored_y_axis[0, :]) + list(mirrored_y_axis[1, :]) + list(mirrored_y_axis[2, :])
-    # make list from rows and add them to a single array
-    #rotation = np.round(rotation, 8)
-    #rotation_list = list(rotation[0, :]) + list(rotation[1, :]) + list(rotation[2, :])
+
+    #experminatel pnp
+    cuboid_3d = np.array(annotation['objects'][0]['cuboid'])
+    cuboid_3d = np.reshape(cuboid_3d, newshape=(8, 3))
+    cuboid_2d = np.array(annotation['objects'][0]['projected_cuboid'])
+    cuboid_2d = np.reshape(cuboid_2d, newshape=(8, 2))
+
 
     # get bounding box:
     bounding_box = object_from_annotation[0]['bounding_box']
@@ -138,4 +176,4 @@ def get_groundtruth_data(raw_data_directory,json_file):
     for t in translation:
         cam_t_m2c_array.append(float(t))
 
-    return cam_R_m2c_array, cam_t_m2c_array, obj_bb
+    return cam_R_m2c_array, cam_t_m2c_array, obj_bb,cuboid_3d,cuboid_2d

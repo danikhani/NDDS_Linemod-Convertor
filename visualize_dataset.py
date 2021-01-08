@@ -39,6 +39,33 @@ def load_linemod_data(models_info_yml_path,gt_yml_path,info_yml_path,frame_numbe
 
     return bb3d_points,cam_R_m2c,cam_t_m2c,obj_bb,cam_K,depth_scale
 
+def load_custome_data(models_info_yml_path,gt_yml_path,info_yml_path,frame_number,model_number):
+    # load points from model_info.yml
+    with open(models_info_yml_path) as file:
+        model_info = yaml.load(file, Loader=yaml.FullLoader)
+    current_model = model_info[model_number]
+    # calculate 3dpoints
+    bb3d_points = tlib.get_bbox_3d(current_model)
+
+    #get groundtruth info from each scene
+    with open(gt_yml_path) as file:
+        gt = yaml.load(file, Loader=yaml.FullLoader)
+    # load rotation and t matrices
+    cam_R_m2c = gt[frame_number][0]['cam_R_m2c']
+    cam_R_m2c = np.reshape(np.array(cam_R_m2c), newshape=(3, 3))
+    cam_t_m2c = np.array(gt[frame_number][0]['cam_t_m2c'])
+    obj_bb = gt[frame_number][0]['obj_bb']
+
+
+    with open(info_yml_path) as file:
+        info = yaml.load(file, Loader=yaml.FullLoader)
+    #load camera settings
+    cam_K = info[frame_number]['cam_K']
+    cam_K = np.reshape(np.array(cam_K), newshape=(3, 3))
+    depth_scale = info[frame_number]['depth_scale']
+
+    return bb3d_points,cam_R_m2c,cam_t_m2c,obj_bb,cam_K,depth_scale
+
 
 def vis_bb(rgb_image_path,models_info_yml_path,gt_yml_path,info_yml_path,img_export_folder,frame_number,model_number):
     # set the saving paths
@@ -62,7 +89,7 @@ def vis_bb(rgb_image_path,models_info_yml_path,gt_yml_path,info_yml_path,img_exp
     tlib.draw_bbox_8_2D(rgb_3d_bbox, projected_points)
     cv2.imwrite(img_path_3d, rgb_3d_bbox)
 
-    img = cv2.imread(img_path_2d, 0)
+    img = cv2.imread(img_path_3d, 0)
 
     plt.imshow(img)
     plt.show()
