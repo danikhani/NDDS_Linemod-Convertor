@@ -70,6 +70,7 @@ def vis_bb(dataset_main_path,frame_number,model_number,export_path):
     # set the saving paths
     img_path_2d =  export_path + '/exported_images/{}_{}.bbox_2d.png'.format(model_number,frame_number)
     img_path_3d = export_path + '/exported_images/{}_{}.bbox_3d.png'.format(model_number,frame_number)
+    print(img_path_2d)
 
     # load rgb image as base.
     rgb_image_path = os.path.join(rgb_path, '{}.png'.format(frame_number))

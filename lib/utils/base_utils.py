@@ -78,7 +78,7 @@ def get_camera_intrinsic(raw_data_directory,json_file):
     return cam_K, depth_scale, image_size
 
 
-def get_groundtruth_data(raw_data_directory,json_file):
+def get_groundtruth_data(raw_data_directory,json_file,length_multipler):
     source_file = os.path.join(raw_data_directory, json_file)
     with open(source_file, 'r') as file:
         annotation = json.loads(file.read())
@@ -86,7 +86,7 @@ def get_groundtruth_data(raw_data_directory,json_file):
     object_from_annotation = annotation['objects']
     # object_class = object_from_annotation[0]["class"]
 
-    translation = np.array(annotation['objects'][0]['location']) # NDDS gives units in centimeters
+    translation = np.array(annotation['objects'][0]['location'])*length_multipler # change box length units
 
     quaternion_obj2cam = rotate.from_quat(np.array(annotation['objects'][0]['quaternion_xyzw']))
     quaternion_cam2world = rotate.from_quat(np.array(annotation['camera_data']['quaternion_xyzw_worldframe']))
@@ -115,6 +115,3 @@ def get_groundtruth_data(raw_data_directory,json_file):
         cam_t_m2c_array.append(float(t))
 
     return cam_R_m2c_array, cam_t_m2c_array, obj_bb
-
-def viulise_boundingbox(image_data,savefolder,show_plt=True):
-    img= np.array(image_data.copy())
