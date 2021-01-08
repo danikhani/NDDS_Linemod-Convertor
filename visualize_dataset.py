@@ -9,7 +9,7 @@ from PIL import Image
 import matplotlib.pyplot as plt
 
 
-import test_lib as tlib
+import lib.utils.visualisation_utils as v_util
 
 
 
@@ -19,7 +19,7 @@ def load_linemod_data(models_info_yml_path,gt_yml_path,info_yml_path,frame_numbe
         model_info = yaml.load(file, Loader=yaml.FullLoader)
     current_model = model_info[model_number]
     # calculate 3dpoints
-    bb3d_points = tlib.get_bbox_3d(current_model)
+    bb3d_points = v_util.get_bbox_3d(current_model)
 
     #get groundtruth info from each scene
     with open(gt_yml_path) as file:
@@ -45,7 +45,7 @@ def load_custome_data(models_info_yml_path,gt_yml_path,info_yml_path,frame_numbe
         model_info = yaml.load(file, Loader=yaml.FullLoader)
     current_model = model_info[model_number]
     # calculate 3dpoints
-    bb3d_points = tlib.get_bbox_3d(current_model)
+    bb3d_points = v_util.get_bbox_3d(current_model)
 
     #get groundtruth info from each scene
     with open(gt_yml_path) as file:
@@ -84,9 +84,9 @@ def vis_bb(rgb_image_path,models_info_yml_path,gt_yml_path,info_yml_path,img_exp
     cv2.imwrite(img_path_2d, rgb_2d_bbox)
     #draw 3d bounding box
     rgb_3d_bbox = np.array(loaded_rgb.copy())
-    projected_points = tlib.project_bbox_3D_to_2D(b3d_points, cam_R_m2c, cam_t_m2c, cam_K,
-                               append_centerpoint=False)
-    tlib.draw_bbox_8_2D(rgb_3d_bbox, projected_points)
+    projected_points = v_util.project_bbox_3D_to_2D(b3d_points, cam_R_m2c, cam_t_m2c, cam_K,
+                                                    append_centerpoint=False)
+    v_util.draw_bbox_8_2D(rgb_3d_bbox, projected_points)
     cv2.imwrite(img_path_3d, rgb_3d_bbox)
 
     img = cv2.imread(img_path_3d, 0)

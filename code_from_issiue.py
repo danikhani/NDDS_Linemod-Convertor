@@ -1,5 +1,5 @@
-import prepr_linemode_util as util
-import test_lib as tlib
+import lib.utils.base_utils as util
+import lib.utils.visualisation_utils as v_util
 import os
 import shutil
 from PIL import Image
@@ -44,10 +44,8 @@ def get_bbox(filename,source_folder):
         quaternion_obj2cam = R.from_quat(np.array(object_data['objects'][0]['quaternion_xyzw']))
         quaternion_cam2world = R.from_quat(np.array(object_data['camera_data']['quaternion_xyzw_worldframe']))
         quaternion_obj2world = quaternion_obj2cam * quaternion_cam2world
-        mirrored_y_axis = quaternion_obj2world.as_dcm()
         r1 = R.from_euler('x', 90, degrees=True)
-        r1 = r1.as_dcm()
-        mirrored_y_axis = np.dot(quaternion_obj2world.as_dcm(), r1)
+        mirrored_y_axis = np.dot(quaternion_obj2world.as_dcm(), r1.as_dcm())
         #mirrored_y_axis = np.dot(quaternion_obj2world.as_dcm(), np.array([[-1, 0, 0], [0, -1, 0], [0, 0, 1]]))
         #mirrored_y_axis = np.dot(quaternion_obj2world.as_dcm(), np.array([[0, 0, 1], [0, 1, 0], [1,0, 0]]))
         #mirrored_y_axis = np.dot(mirrored_y_axis, np.array([[0, 0, 1], [1, 0, 0], [1, 0, 0]]))
@@ -121,11 +119,11 @@ def vis_bb(image_name,name,savefolder,source_folder,model_number):
     current_model = model_info[model_number]
     # calculate 3dpoints
     img_3d = np.array(img.copy())
-    bb3d_points = tlib.get_bbox_3d(current_model)
-    projected_points = tlib.project_bbox_3D_to_2D(bb3d_points, cam_R_m2c, cam_t_m2c, cam_K,
-                                                  append_centerpoint=False)
-    tlib.draw_bbox_8_2D(img_3d, projected_points)
-    tlib.draw_bbox_8_2D(img_3d, projected_3d)
+    bb3d_points = v_util.get_bbox_3d(current_model)
+    projected_points = v_util.project_bbox_3D_to_2D(bb3d_points, cam_R_m2c, cam_t_m2c, cam_K,
+                                                    append_centerpoint=False)
+    v_util.draw_bbox_8_2D(img_3d, projected_points)
+    #tlib.draw_bbox_8_2D(img_3d, projected_3d)
     img_3d_name = savefolder + '/1.3d.png'
 
 
@@ -157,5 +155,5 @@ def vis_bb(image_name,name,savefolder,source_folder,model_number):
     plt.show()
 '''
 
-vis_bb('000012.png','000012.json','datasets/testfolder','datasets/diff_focal_length',17)
+vis_bb('000016.png','000016.json','datasets/testfolder','datasets/try1',16)
 

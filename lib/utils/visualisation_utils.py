@@ -1,15 +1,7 @@
-import prepr_linemode_util as util
-
-import os
-import shutil
-from PIL import Image
-import yaml
-import io
-import json
 import numpy as np
-from scipy.spatial.transform import Rotation as R
 import cv2
 from plyfile import PlyData
+
 
 def transform_rotation(rotation_matrix, rotation_representation):
     """
@@ -150,16 +142,3 @@ def draw_bbox_8_2D(draw_img, bbox_8_2D, color=(0, 255, 0), thickness=2):
     if len(bbox) == 9:
         # draw centerpoint
         cv2.circle(draw_img, bbox[8], 3, color, -1)
-
-
-
-def project(xyz, K, RT):
-    """
-    xyz: [N, 3]
-    K: [3, 3]
-    RT: [3, 4]
-    """
-    xyz = np.dot(xyz, RT[:, :3].T) + RT[:, 3:].T
-    xyz = np.dot(xyz, K.T)
-    xy = xyz[:, :2] / xyz[:, 2:]
-    return xy

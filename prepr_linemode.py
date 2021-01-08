@@ -2,7 +2,7 @@ import os
 from natsort import natsorted
 import numpy as np
 
-import prepr_linemode_util as util
+import lib.utils.base_utils as util
 
 def make_linemode_dataset(raw_NDDS_directory,saving_path,object_id):
     raw_data_directory = raw_NDDS_directory
@@ -82,31 +82,17 @@ def make_linemode_dataset(raw_NDDS_directory,saving_path,object_id):
 
     # writing the yaml filses:
     yml_index = 0
-    cam_matrix = np.reshape(np.array(cam_K), newshape=(3, 3))
     for data_name in sorted_list_of_files:
         # writing gt.yml
         if data_name.endswith('.json') and not data_name.endswith('settings.json'):
             #get the arrays from the json files.
-            cam_R_m2c_array, cam_t_m2c_array, obj_bb,cuboid_3d,cuboid_2d = util.get_groundtruth_data(raw_data_directory, data_name)
-            rt, tt = util.pnp(cuboid_3d, cuboid_2d, cam_matrix)
-            print(cuboid_3d, cuboid_2d)
-            rotation_list = list(rt[0, :]) + list(rt[1, :]) + list(rt[2, :])
-            cam_R_m2c = []
-            cam_t_m2c = []
-            for r in rotation_list:
-                cam_R_m2c.append(float(r))
-
-            for t in tt:
-                cam_t_m2c.append(float(t))
+            cam_R_m2c_array, cam_t_m2c_array, obj_bb = util.get_groundtruth_data(raw_data_directory, data_name)
             #save arrays in gt.yml
-            util.parse_groundtruth_yml(ground_truth_path, yml_index, cam_R_m2c, cam_t_m2c, obj_bb, object_id)
+            util.parse_groundtruth_yml(ground_truth_path, yml_index, cam_R_m2c_array, cam_t_m2c_array, obj_bb, object_id)
             # save info.yml
             util.parse_camera_intrinsic_yml(camera_info_path, yml_index, cam_K, depth_scale)
             yml_index +=1
 
-
-
-    print(cam_R_m2c_array)
     print('data generated!')
     print('yml_index,mask_index,depth_index,rgb_index are:')
     print(yml_index,mask_index,depth_index,rgb_index)
