@@ -29,17 +29,29 @@ def get_bbox(filename,source_folder):
         bbox_y = round(bbox['top_left'][1])
         bbox_w = round(bbox['bottom_right'][0]) - bbox_x
         bbox_h = round(bbox['bottom_right'][1]) - bbox_y
-        cam_K_np = np.array(camera_data['camera_settings'][0]['intrinsic_settings'])
+        intrinsic_settings = camera_data['camera_settings'][0]['intrinsic_settings']
+        fx = float(intrinsic_settings['fx'])
+        ux = float(intrinsic_settings['cx'])
+        fy = float(intrinsic_settings['fy'])
+        uy = float(intrinsic_settings['cy'])
+        s = float(intrinsic_settings['s'])
+        cam_K = [fx, 0, ux, 0, fy, uy, 0, 0, 1.0]
+        cam_K_np = np.reshape(np.array(cam_K), newshape=(3, 3))
         yaml_out = {}
 
-        translation = np.array(object_data['objects'][0]['location']) * 10  # NDDS gives units in centimeters
+        translation = np.array(object_data['objects'][0]['location'])  # NDDS gives units in centimeters
 
         quaternion_obj2cam = R.from_quat(np.array(object_data['objects'][0]['quaternion_xyzw']))
         quaternion_cam2world = R.from_quat(np.array(object_data['camera_data']['quaternion_xyzw_worldframe']))
         quaternion_obj2world = quaternion_obj2cam * quaternion_cam2world
-
-        mirrored_y_axis = np.dot(quaternion_obj2world.as_dcm(), np.array([[-1, 0, 0], [0, -1, 0], [0, 0, 1]]))
-
+        mirrored_y_axis = quaternion_obj2world.as_dcm()
+        r1 = R.from_euler('x', 90, degrees=True)
+        r1 = r1.as_dcm()
+        mirrored_y_axis = np.dot(quaternion_obj2world.as_dcm(), r1)
+        #mirrored_y_axis = np.dot(quaternion_obj2world.as_dcm(), np.array([[-1, 0, 0], [0, -1, 0], [0, 0, 1]]))
+        #mirrored_y_axis = np.dot(quaternion_obj2world.as_dcm(), np.array([[0, 0, 1], [0, 1, 0], [1,0, 0]]))
+        #mirrored_y_axis = np.dot(mirrored_y_axis, np.array([[0, 0, 1], [1, 0, 0], [1, 0, 0]]))
+        #mirrored_y_axis = quaternion_obj2world.as_dcm()
 
         # get the corners of bounding boxes from annotations
         bbox = object_data['objects'][0]['bounding_box']
@@ -57,19 +69,41 @@ def get_bbox(filename,source_folder):
         points_2D = np.squeeze(points_2D)'''
         points_2D = 1
 
+        '''experimental'''
+        cuboid_3d = np.array(object_data['objects'][0]['cuboid'])
+        cuboid_3d = np.reshape(cuboid_3d, newshape=(8, 3))
+        cuboid_2d = np.array(object_data['objects'][0]['projected_cuboid'])
+        cuboid_2d = np.reshape(cuboid_2d, newshape=(8, 2))
+        rt, tt = util.pnp(cuboid_3d, cuboid_2d, cam_K_np)
+
+        '''experimental2'''
+        t2 = np.array(object_data['objects'][0]['location'])
+        t2 = np.round(t2, 8)
+
+        r2 = np.asarray(object_data['objects'][0]['pose_transform'])[0:3, 0:3]
+        r2 = np.dot(r2, np.array([[-1, 0, 0], [0, -1, 0], [0, 0, -1]]))
+        r2 = np.dot(r2.T, np.array([[1, 0, 0], [0, 1, 0], [0, 0, -1]]))
+        r2 = np.dot(r2, np.array([[0, 1, 0], [1, 0, 0], [0, 0, 1]]))
+        r2 = np.dot(r2.T, np.array([[0, 1, 0], [1, 0, 0], [0, 0, 1]]))
+        #r2 = np.dot(r2.T, np.array([[-1, 0, 0], [0, 1, 0], [0, 0, 1]]))
+        #r2 = np.dot(r2, np.array([[-1, 0, 0], [0, -1, 0], [0, 0, -1]]))
+        # make list from rows and add them to a single array
+        #r2 = np.round(r2, 8)
+        #rotation_list = list(rotation[0, :]) + list(rotation[1, :]) + list(rotation[2, :])
+
         print(bbox)
         print(translation)
         print(mirrored_y_axis)
         print(cam_K_np)
         print(points_2D)
-        return rmin, rmax, cmin, cmax, points_2D,projected_3d
+        return rmin, rmax, cmin, cmax, points_2D,projected_3d,mirrored_y_axis,translation,cam_K_np,rt, tt,r2,t2
 
 
-def vis_bb(image_name,name,savefolder,source_folder):
+def vis_bb(image_name,name,savefolder,source_folder,model_number):
     #cam_R_m2c_array, cam_t_m2c_array, obj_bb = util.get_groundtruth_data('datasets/try1', name)
     #print(cam_R_m2c_array, cam_t_m2c_array, obj_bb)
 
-    rmin, rmax, cmin, cmax, points_2D,projected_3d = get_bbox(name,source_folder)
+    rmin, rmax, cmin, cmax, points_2D,projected_3d,cam_R_m2c,cam_t_m2c,cam_K,cam_R_m2c2, cam_t_m2c2,cam_R_m2c3, cam_t_m2c3= get_bbox(name,source_folder)
     img = Image.open(os.path.join(source_folder, image_name))
     img_bbox = np.array(img.copy())
     img_name = savefolder + '/1.bbox.png'
@@ -80,15 +114,27 @@ def vis_bb(image_name,name,savefolder,source_folder):
     plt.imshow(img2d)
     plt.show()
 
+    '''3d projection'''
+    with open('datasets/models_info.yml') as file:
+        model_info = yaml.load(file, Loader=yaml.FullLoader)
 
+    current_model = model_info[model_number]
+    # calculate 3dpoints
     img_3d = np.array(img.copy())
+    bb3d_points = tlib.get_bbox_3d(current_model)
+    projected_points = tlib.project_bbox_3D_to_2D(bb3d_points, cam_R_m2c, cam_t_m2c, cam_K,
+                                                  append_centerpoint=False)
+    tlib.draw_bbox_8_2D(img_3d, projected_points)
+    tlib.draw_bbox_8_2D(img_3d, projected_3d)
     img_3d_name = savefolder + '/1.3d.png'
-    tlib.draw_bbox_8_2D(img_3d,projected_3d)
+
+
     #cv2_img = cv2.polylines(img_3d, points_2D, True, (0, 255, 255))
     cv2.imwrite(img_3d_name, img_3d)
     img3dd = cv2.imread(img_3d_name, 0)
     plt.imshow(img3dd)
     plt.show()
+
 
     '''other loading
     # load rgb image as base.
@@ -111,5 +157,5 @@ def vis_bb(image_name,name,savefolder,source_folder):
     plt.show()
 '''
 
-vis_bb('000021.png','000021.json','datasets/testfolder','datasets/diff_focal_length')
+vis_bb('000012.png','000012.json','datasets/testfolder','datasets/diff_focal_length',17)
 

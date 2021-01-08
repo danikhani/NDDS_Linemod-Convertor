@@ -12,9 +12,9 @@ import time
 def parse_args():
     """Use argparse to get command line arguments."""
     parser = argparse.ArgumentParser()
-    parser.add_argument('-i', help='Input path. Folder with NDDS images.')
-    parser.add_argument('-o', help='Output path. Folder directory to store output images.')
-    parser.add_argument('-p', help="Percent of data to use as training. From 0.0 to 1.0 .")
+    parser.add_argument('-i', help='Input path. Folder with NDDS images.',default='datasets/diff_focal_length')
+    parser.add_argument('-o', help='Output path. Folder directory to store output images.',default='datasets/singleshot_from_ndds')
+    parser.add_argument('-p', help="Percent of data to use as training. From 0.0 to 1.0 .",default = 0.9)
     args = parser.parse_args()
 
     return args
