@@ -24,6 +24,11 @@ def make_linemode_dataset(raw_NDDS_directory,saving_path,object_id,length_multip
     ground_truth_path = main_data_path+'/gt.yml'
     camera_info_path = main_data_path+'/info.yml'
 
+    # test.txt & train.txt path
+    test_txt_path = main_data_path + '/test.txt'
+    train_txt_path = main_data_path + '/train.txt'
+    train_percentage = 0.9
+
     #what kind of files want to get extraceted
     depth_ending = '.depth.cm.16.png'
     mask_ending = '.cs.png'
@@ -92,6 +97,16 @@ def make_linemode_dataset(raw_NDDS_directory,saving_path,object_id,length_multip
             # save info.yml
             util.parse_camera_intrinsic_yml(camera_info_path, yml_index, cam_K, depth_scale)
             yml_index +=1
+
+    #generate training and test_files
+    training_frames,test_frames = util.make_training_set(0,rgb_index,train_percentage)
+    with open(train_txt_path, 'w') as f:
+        for item in training_frames:
+            f.write("%s\n" % item)
+
+    with open(test_txt_path, 'w') as f:
+        for item in test_frames:
+            f.write("%s\n" % item)
 
     print('data generated!')
     print('yml_index,mask_index,depth_index,rgb_index are:')

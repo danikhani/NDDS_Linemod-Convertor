@@ -8,6 +8,7 @@ import numpy as np
 import pandas as pd
 import json
 import yaml
+import random
 
 import matplotlib
 import matplotlib.pyplot as plt
@@ -115,3 +116,17 @@ def get_groundtruth_data(raw_data_directory,json_file,length_multipler):
         cam_t_m2c_array.append(float(t))
 
     return cam_R_m2c_array, cam_t_m2c_array, obj_bb
+
+# generate test and train data numbers:
+def make_training_set(start,end,training_percent):
+    # Generate 'n' unique random numbers within a range
+    number_of_test = int((1-training_percent)*(end-start))
+    test_frames = random.sample(range(start, end), number_of_test)
+    test_frames.sort()
+    training_frames = list(range(start, end))
+    # removing test_frames from the trainings_frame
+    for i in test_frames:
+        if i in training_frames:
+            training_frames.remove(i)
+
+    return training_frames,test_frames
