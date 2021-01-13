@@ -1,6 +1,6 @@
 from prepr_linemode import make_linemode_dataset
 from visualize_dataset import vis_bb
-
+import write_model_info as model_info
 import argparse
 
 
@@ -28,7 +28,8 @@ if __name__ == "__main__":
     length_multipler = 0.01
 
     ############ generate the linemode dataset #############
-    make_linemode_dataset(dataset_main_path+'/NDDS_10k', dataset_main_path, model_number, length_multipler)
+    #make_linemode_dataset(dataset_main_path+'/NDDS_10k', dataset_main_path, model_number, length_multipler)
     ############ generate the linemode dataset #############
     generated_dataset_path = dataset_main_path+'/generated_dataset'
-    vis_bb(generated_dataset_path, frame_number_to_visulize,model_number,dataset_main_path)
+    #vis_bb(generated_dataset_path, frame_number_to_visulize,model_number,dataset_main_path)
+    model_info.read_ply_info('obj_01.ply')

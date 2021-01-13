@@ -1,6 +1,5 @@
 import numpy as np
 import cv2
-from plyfile import PlyData
 
 
 def transform_rotation(rotation_matrix, rotation_representation):
@@ -36,22 +35,6 @@ def project_points_3D_to_2D(points_3D, rotation_vector, translation_vector, came
     points_2D = np.squeeze(points_2D)
 
     return points_2D
-
-def load_model_ply(path_to_ply_file):
-        """
-       Loads a 3D model from a plyfile
-        Args:
-            path_to_ply_file: Path to the ply file containing the object's 3D model
-        Returns:
-            points_3d: numpy array with shape (num_3D_points, 3) containing the x-, y- and z-coordinates of all 3D model points
-
-        """
-        model_data = PlyData.read(path_to_ply_file)
-
-        vertex = model_data['vertex']
-        points_3d = np.stack([vertex[:]['x'], vertex[:]['y'], vertex[:]['z']], axis=-1)
-
-        return points_3d
 
 
 
