@@ -2,6 +2,8 @@ import numpy as np
 import io
 import yaml
 from plyfile import PlyData
+from scipy.spatial import distance
+import math
 
 
 def load_model_ply(path_to_ply_file):
@@ -49,23 +51,33 @@ def get_model_centers(corners_3d):
     return center_3d
 
 def get_model_diamater(corners_3d):
+    # more on diamater:  https://github.com/thodan/sixd_toolkit/blob/96bb268e1fb5ebd82ca1b8d352e3263561ba6f5c/pysixd/misc.py
     diameter = np.linalg.norm(np.max(corners_3d, 0) - np.min(corners_3d, 0))
     return diameter
 
 
-def export_model_para_yml(file_path, model_number, corner_3d, distances,diameter):
+def read_ply_info(ply_path):
+    model_3d_points = load_model_ply(ply_path)
+
+    model_corner = get_model_corners(model_3d_points)
+    model_distances = get_model_distances(model_corner)
+    model_diameter = get_model_diamater(model_corner)
+
+    return model_corner, model_distances ,model_diameter
+
+
+def export_model_para_yml(file_path, model_number, model_corners, model_distances,model_diameter):
     model_paras = {
         model_number: {
-            'diameter': diameter.tolist(),
-            'min_x': corner_3d[0][0].tolist(),
-            'min_y': corner_3d[0][1].tolist(),
-            'min_z': corner_3d[0][2].tolist(),
-            'size_x': distances[0].tolist(),
-            'size_y': distances[1].tolist(),
-            'size_z': distances[2].tolist(),
+            'diameter': round(model_diameter.tolist(),4),
+            'min_x': round(model_corners[0][0].tolist(),4),
+            'min_y': round(model_corners[0][1].tolist(),4),
+            'min_z': round(model_corners[0][2].tolist(),4),
+            'size_x': round(model_distances[0].tolist(),4),
+            'size_y': round(model_distances[1].tolist(),4),
+            'size_z': round(model_distances[2].tolist(),4),
         }
     }
 
     with io.open(file_path, 'w', encoding='utf8') as outfile:
-        yaml.dump(model_paras, outfile, default_flow_style=None)
-
+        yaml.dump(model_paras, outfile, default_flow_style=None,width=1000)

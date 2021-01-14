@@ -37,7 +37,7 @@ def parse_camera_intrinsic_yml(file_path, number_of_frame, cam_K_array, depth_sc
         }
     }
     with io.open(file_path, 'a', encoding='utf8') as outfile:
-        yaml.dump(camera_intrinsic, outfile, default_flow_style=None)
+        yaml.dump(camera_intrinsic, outfile, default_flow_style=None,width=1000)
 
 # {0: [{'cam_R_m2c': [0.0963063, 0.99404401, 0.0510079, 0.57332098, -0.0135081, -0.81922001, -0.81365103, 0.10814, -0.57120699],
 # 'cam_t_m2c': [-105.3577515, -117.52119142, 1014.8770132], 'obj_bb': [244, 150, 44, 58], 'obj_id': 1}], 1: ... }
@@ -51,7 +51,7 @@ def parse_groundtruth_yml(file_path, number_of_frame, cam_R_m2c_array, cam_t_m2c
         }]
     }
     with io.open(file_path, 'a', encoding='utf8') as outfile:
-        yaml.dump(ground_truth, outfile, default_flow_style=None)
+        yaml.dump(ground_truth, outfile, default_flow_style=None,width=1000)
 
 def get_camera_intrinsic(raw_data_directory,json_file):
     # https://github.com/thodan/sixd_toolkit/blob/master/doc/sixd_2017_datasets_format.md

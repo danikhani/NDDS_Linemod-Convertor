@@ -32,4 +32,4 @@ if __name__ == "__main__":
     ############ generate the linemode dataset #############
     generated_dataset_path = dataset_main_path+'/generated_dataset'
     #vis_bb(generated_dataset_path, frame_number_to_visulize,model_number,dataset_main_path)
-    model_info.read_ply_info('obj_01.ply')
+    model_info.export_model_info('obj_01.yml','datasets/Linemod_preprocessed/models/obj_08.ply',1)
