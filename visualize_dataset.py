@@ -2,11 +2,8 @@ import os
 import numpy as np
 import cv2
 import yaml
-import random
-import copy
-from plyfile import PlyData
+
 from PIL import Image
-import matplotlib.pyplot as plt
 
 import lib.utils.visualisation_utils as v_util
 
@@ -67,10 +64,6 @@ def vis_bb(dataset_main_path,frame_number,model_number,export_path):
     # get the data
     b3d_points, cam_R_m2c, cam_t_m2c, obj_bb, cam_K = load_linemod_data(models_info_yml_path, gt_yml_path,
                                                                         info_yml_path, frame_number, model_number)
-    # set the saving paths
-    img_path_2d =  export_path + '/exported_images/{}_{}.bbox_2d.png'.format(model_number,frame_number)
-    img_path_3d = export_path + '/exported_images/{}_{}.bbox_3d.png'.format(model_number,frame_number)
-    print(img_path_2d)
 
     # load rgb image as base.
     rgb_image_path = os.path.join(rgb_path, '{}.png'.format(frame_number))
@@ -79,18 +72,25 @@ def vis_bb(dataset_main_path,frame_number,model_number,export_path):
     ###### draw 2d bounding box ######
     rgb_2d_bbox = np.array(loaded_rgb.copy())
     cv2.rectangle(rgb_2d_bbox, (obj_bb[0], obj_bb[1]), (obj_bb[0]+obj_bb[2], obj_bb[1]+obj_bb[3]), (255, 0, 0), 2)
-    cv2.imwrite(img_path_2d, rgb_2d_bbox)
+
     ###### draw 3d bounding box ######
     rgb_3d_bbox = np.array(loaded_rgb.copy())
     projected_points = v_util.project_bbox_3D_to_2D(b3d_points, cam_R_m2c, cam_t_m2c, cam_K,
                                                     append_centerpoint=False)
     v_util.draw_bbox_8_2D(rgb_3d_bbox, projected_points)
-    cv2.imwrite(img_path_3d, rgb_3d_bbox)
 
-    img3d = cv2.imread(img_path_3d, 0)
-    img2d = cv2.imread(img_path_2d, 0)
+    # show images
+    print('want to show image but dont know')
+    cv2.imshow('2D bounding box',rgb_2d_bbox)
+    cv2.imshow('3D bounding box', rgb_3d_bbox)
+    # press any key to close
+    print("Press any key to close the images. DO NOT clsoe the images by clicking on X")
+    cv2.waitKey(0)
 
-    plt.imshow(img2d)
-    plt.show()
-    plt.imshow(img3d)
-    plt.show()
+
+    # set the saving paths
+    if export_path is not None:
+        img_path_2d =  export_path + '/exported_images/{}_{}.bbox_2d.png'.format(model_number,frame_number)
+        img_path_3d = export_path + '/exported_images/{}_{}.bbox_3d.png'.format(model_number,frame_number)
+        cv2.imwrite(img_path_2d, rgb_2d_bbox)
+        cv2.imwrite(img_path_3d, rgb_3d_bbox)

@@ -1,6 +1,8 @@
+opencv-python
+scipy
 numpy
 pillow
 pyyaml
 pandas
-matplotlib
 natsort
+plyfile

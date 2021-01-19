@@ -4,7 +4,7 @@ import numpy as np
 
 import lib.utils.base_utils as util
 
-def make_linemode_dataset(raw_NDDS_directory,saving_path,object_id,length_multipler):
+def make_linemode_dataset(raw_NDDS_directory,saving_path,object_id,length_multipler,train_percentage):
     raw_data_directory = raw_NDDS_directory
 
     # default settings:
@@ -13,8 +13,8 @@ def make_linemode_dataset(raw_NDDS_directory,saving_path,object_id,length_multip
     image_size = [640, 480]
 
     #structure of data:
-    main_data_path = os.path.join(saving_path, 'generated_dataset/data/{}'.format(object_id))
-    main_model_path = os.path.join(saving_path, 'generated_dataset/models')
+    main_data_path = os.path.join(saving_path, 'data/{}'.format(object_id))
+    main_model_path = os.path.join(saving_path, 'models')
 
     depth_folder = 'depth'
     mask_folder = 'mask'
@@ -27,7 +27,6 @@ def make_linemode_dataset(raw_NDDS_directory,saving_path,object_id,length_multip
     # test.txt & train.txt path
     test_txt_path = main_data_path + '/test.txt'
     train_txt_path = main_data_path + '/train.txt'
-    train_percentage = 0.9
 
     #what kind of files want to get extraceted
     depth_ending = '.depth.cm.16.png'

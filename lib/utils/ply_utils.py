@@ -2,8 +2,6 @@ import numpy as np
 import io
 import yaml
 from plyfile import PlyData
-from scipy.spatial import distance
-import math
 
 
 def load_model_ply(path_to_ply_file):
