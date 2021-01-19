@@ -37,7 +37,7 @@ def parse_args(args):
     NDDS_convertor.add_argument('--save-path',help='Path to save the dataset',default='datasets/test_dataset/generated_dataset')
     # since the files are from cad and each one of them has a different length unit.
     # use this length factor if the visulized box is too small or too big!
-    NDDS_convertor.add_argument('--scaler',
+    NDDS_convertor.add_argument('--scale',
                         help='Use one of these values to scale the box: (0.01,0.1,1,10,100). The smaller value makes a bigger box',
                         type=float, default=1)
 
@@ -74,9 +74,9 @@ def main(args = None):
     if args['conversion'] == 'ndds':
         raw_ndds_data = args['ndds_path']
         export_dataset_path = args['save_path']
-        scaler = args['scaler']
+        scale = args['scale']
         train_percentage = args['train_percentage']
-        make_linemode_dataset(raw_ndds_data, export_dataset_path, model_number, scaler,train_percentage)
+        make_linemode_dataset(raw_ndds_data, export_dataset_path, model_number, scale,train_percentage)
 
 
 if __name__ == '__main__':

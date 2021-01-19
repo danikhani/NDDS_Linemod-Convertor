@@ -4,7 +4,7 @@ import numpy as np
 
 import lib.utils.base_utils as util
 
-def make_linemode_dataset(raw_NDDS_directory,saving_path,object_id,length_multipler,train_percentage):
+def make_linemode_dataset(raw_NDDS_directory,saving_path,object_id,length_scale,train_percentage):
     raw_data_directory = raw_NDDS_directory
 
     # default settings:
@@ -90,7 +90,7 @@ def make_linemode_dataset(raw_NDDS_directory,saving_path,object_id,length_multip
         # writing gt.yml
         if data_name.endswith('.json') and not data_name.endswith('settings.json'):
             #get the arrays from the json files.
-            cam_R_m2c_array, cam_t_m2c_array, obj_bb = util.get_groundtruth_data(raw_data_directory, data_name,length_multipler)
+            cam_R_m2c_array, cam_t_m2c_array, obj_bb = util.get_groundtruth_data(raw_data_directory, data_name,length_scale)
             #save arrays in gt.yml
             util.parse_groundtruth_yml(ground_truth_path, yml_index, cam_R_m2c_array, cam_t_m2c_array, obj_bb, object_id)
             # save info.yml
