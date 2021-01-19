@@ -1,6 +1,9 @@
 # Converting NDDS-Data to Preprocessed Linemod
 This repository can be used to easily convert the data generated with [NDDS](https://github.com/NVIDIA/Dataset_Synthesizer) to [preprocessed Linemod](https://github.com/ybkscht/EfficientPose).
 
+![NDDS_convertor](pictures/ndds_convertor.png)
+
+
 ## Installing the code
 * Use conda to install the code
 ```bash
