@@ -1,17 +1,11 @@
 import os
 import io
 import shutil
-import numpy as np
 from scipy.spatial.transform import Rotation as rotate
-from PIL import Image
 import numpy as np
-import pandas as pd
 import json
 import yaml
 import random
-
-import matplotlib
-import matplotlib.pyplot as plt
 
 def make_empty_folder(main_path,folder):
     folder_path = os.path.join(main_path, folder)
