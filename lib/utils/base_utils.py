@@ -7,6 +7,7 @@ import json
 import yaml
 import random
 
+
 def make_empty_folder(main_path,folder):
     folder_path = os.path.join(main_path, folder)
     try:
@@ -81,14 +82,19 @@ def get_groundtruth_data(raw_data_directory,json_file,length_multipler):
     object_from_annotation = annotation['objects']
     # object_class = object_from_annotation[0]["class"]
 
-    translation = np.array(annotation['objects'][0]['location'])*length_multipler # change box length units
+    # translation
+    translation = np.array(object_from_annotation[0]['location']) * length_multipler
 
-    quaternion_obj2cam = rotate.from_quat(np.array(annotation['objects'][0]['quaternion_xyzw']))
-    quaternion_cam2world = rotate.from_quat(np.array(annotation['camera_data']['quaternion_xyzw_worldframe']))
-    quaternion_obj2world = quaternion_obj2cam * quaternion_cam2world
-    r1 = rotate.from_euler('x', 90, degrees=True)
-    rotation_matrix = np.dot(quaternion_obj2world.as_dcm(), r1.as_dcm())
-    rotation_list = list(rotation_matrix[0, :]) + list(rotation_matrix[1, :]) + list(rotation_matrix[2, :])
+    # rotation
+    rotation = np.asarray(object_from_annotation[0]['pose_transform'])[0:3, 0:3]
+    rotation = np.dot(rotation, np.array([[-1, 0, 0], [0, -1, 0], [0, 0, -1]]))
+    rotation = np.dot(rotation.T, np.array([[1, 0, 0], [0, 1, 0], [0, 0, -1]]))
+
+    r1 = rotate.from_euler('z', 90, degrees=True)
+    rotation = np.dot(rotation, r1.as_dcm())
+
+    rotation_list = list(rotation[0, :]) + list(rotation[1, :]) + list(rotation[2, :])
+
 
     # get bounding box:
     bounding_box = object_from_annotation[0]['bounding_box']
