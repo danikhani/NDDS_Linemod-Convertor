@@ -1,10 +1,10 @@
 # Converting NDDS-Data to Preprocessed Linemod
 This repository can be used to easily convert the data generated with [NDDS](https://github.com/NVIDIA/Dataset_Synthesizer) to [preprocessed Linemod](https://github.com/ybkscht/EfficientPose).
 
-![NDDS_convertor](pictures/ndds_convertor.png)
+![NDDS_convertor](pictures/ndds_convertor2.png)
 
 
-## Installing the code
+## Prerequisites
 * Use conda to install the code
 ```bash
 conda create -n nddsConvertor python=3.6
@@ -12,7 +12,7 @@ conda activate nddsConvertor
 pip install -r requirements.txt
 ```
 ## Using the code
-This repository cotains 3 different tools, which all helps you to convert your data:
+This repository contains 3 different tools, which are introduced in the picture above or in the section below:
 
 ### 1 NDDS Images Groundtruth convertor
 After generating RGB, Depth, Mask and Groundtruth data with NDDS. Use the following command to convert them:
