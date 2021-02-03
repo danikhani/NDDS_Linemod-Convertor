@@ -48,13 +48,12 @@ def parse_groundtruth_yml(file_path, number_of_frame, cam_R_m2c_array, cam_t_m2c
     with io.open(file_path, 'a', encoding='utf8') as outfile:
         yaml.dump(ground_truth, outfile, default_flow_style=None,width=1000)
 
-def get_camera_intrinsic(raw_data_directory,json_file):
+def read_camera_intrinsic_json(file_path):
     # https://github.com/thodan/sixd_toolkit/blob/master/doc/sixd_2017_datasets_format.md
     # cam_K - 3x3 intrinsic camera matrix K (saved row-wise)
     # https://github.com/zju3dv/clean-pvnet/issues/118:
     # [fx, 0, ux, 0, fy, uy, 0, 0, 1]
-    source_file = os.path.join(raw_data_directory, json_file)
-    with open(source_file, 'r') as file:
+    with open(file_path, 'r') as file:
         annotation = json.loads(file.read())
 
     camera_settings = annotation['camera_settings']

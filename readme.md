@@ -1,7 +1,7 @@
 # Converting NDDS-Data to Preprocessed Linemod
 This repository can be used to easily convert the data generated with [NDDS](https://github.com/NVIDIA/Dataset_Synthesizer) to [preprocessed Linemod](https://github.com/ybkscht/EfficientPose).
 
-![NDDS_convertor](pictures/ndds_convertor.png)
+![NDDS_convertor2](pictures/ndds_convertor.png)
 
 
 ## Installing the code
@@ -12,7 +12,7 @@ conda activate nddsConvertor
 pip install -r requirements.txt
 ```
 ## Using the code
-This repository cotains 3 different tools, which all helps you to convert your data:
+This repository contains 3 different tools, which all helps you to convert your data:
 
 ### 1 NDDS Images Groundtruth convertor
 After generating RGB, Depth, Mask and Groundtruth data with NDDS. Use the following command to convert them:
@@ -55,3 +55,17 @@ args are:
 * --ply-path: Path to the .ply file
 * --save-path', The path to save the obj.yml containing the points
 
+##Citation
+These two projects helped to understand the rotation matrices and 6DoF transformation:
+*https://github.com/KatharinaSchmidt/clean-pvnet
+*https://github.com/ybkscht/EfficientPose
+```bash
+@misc{bukschat2020efficientpose,
+      title={EfficientPose: An efficient, accurate and scalable end-to-end 6D multi object pose estimation approach}, 
+      author={Yannick Bukschat and Marcus Vetter},
+      year={2020},
+      eprint={2011.04307},
+      archivePrefix={arXiv},
+      primaryClass={cs.CV}
+}
+```
