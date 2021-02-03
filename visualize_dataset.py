@@ -2,7 +2,6 @@ import os
 import numpy as np
 import cv2
 import yaml
-
 from PIL import Image
 
 import lib.utils.visualisation_utils as v_util

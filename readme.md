@@ -1,7 +1,7 @@
 # Converting NDDS-Data to Preprocessed Linemod
 This repository can be used to easily convert the data generated with [NDDS](https://github.com/NVIDIA/Dataset_Synthesizer) to [preprocessed Linemod](https://github.com/ybkscht/EfficientPose).
 
-![NDDS_convertor2](pictures/ndds_convertor.png)
+![Project overview](pictures/ndds_convertor2.png)
 
 
 ## Installing the code
@@ -57,8 +57,8 @@ args are:
 
 ##Citation
 These two projects helped to understand the rotation matrices and 6DoF transformation:
-*https://github.com/KatharinaSchmidt/clean-pvnet
-*https://github.com/ybkscht/EfficientPose
+* https://github.com/KatharinaSchmidt/clean-pvnet
+* https://github.com/ybkscht/EfficientPose
 ```bash
 @misc{bukschat2020efficientpose,
       title={EfficientPose: An efficient, accurate and scalable end-to-end 6D multi object pose estimation approach}, 

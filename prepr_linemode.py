@@ -62,9 +62,10 @@ def make_linemode_dataset(raw_NDDS_directory,saving_path,object_id,length_scale,
     # get saving paths
     depth_path,mask_path,rgb_path,main_model_path,ground_truth_path,camera_info_path,test_txt_path,train_txt_path = create_saving_folders(saving_path,object_id)
 
-    # get camera instrinsics
-    cam_K, depth_scale, image_size = util.read_camera_intrinsic_json(raw_NDDS_directory + '/_camera_settings.json')
+    # get camera intrinsics
+    cam_K, depth_scale, image_size = util.read_camera_intrinsic_json(os.path.join(raw_NDDS_directory,'_camera_settings.json'))
 
+    # finding and copying the depth, mask and rgb images
     mask_index = 0
     depth_index = 0
     rgb_index = 0
@@ -98,7 +99,7 @@ def make_linemode_dataset(raw_NDDS_directory,saving_path,object_id,length_scale,
             util.parse_camera_intrinsic_yml(camera_info_path, yml_index, cam_K, depth_scale)
             yml_index += 1
 
-    #generate training and test_files
+    #generate training and test .txt files
     training_frames,test_frames = util.make_training_set(0,rgb_index,train_percentage)
     with open(train_txt_path, 'w') as f:
         for item in training_frames:
@@ -108,9 +109,8 @@ def make_linemode_dataset(raw_NDDS_directory,saving_path,object_id,length_scale,
         for item in test_frames:
             f.write("%s\n" % item)
 
-    print('data generated!')
-    print('yml_index,mask_index,depth_index,rgb_index are:')
-    print(yml_index,mask_index,depth_index,rgb_index)
+    print('\ndataset has been converted! Check the indexes below. If they are equal, the process has been successful!')
+    print('yml_index: {}\nmask_index: {}\ndepth_index: {}\nrgb_index: {}\n'.format(yml_index,mask_index,depth_index,rgb_index))
 
 
 
